@@ -1,2 +1,6 @@
 output/*
 reference_data/*
+*.err
+*.out
+src/slurm
+.ipynb_checkpoints
