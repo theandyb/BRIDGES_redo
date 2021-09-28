@@ -11,7 +11,7 @@ For this step we simply rely on the vcftools `--singletons` option. This is done
 
 # Step 2: Annotate singletons
 
-For this step, we will loop over all the singletons and pull the 21-mer motif centered at each position
+For this step, we will loop over all the singletons and pull the 21-mer motif centered at each position. We do this in two stages; first, we run `step2_append_motif.py` to annotate each position with the 21-mer motif and the simple subtype. We then run `step2_additional_anno.R` to take reverse-complement (when necessary) and produce the "full" subtype (i.e. A>C is now AT>CG, C>T is now GC>AT, etc)
 
 # Step 3: Sample control distribution
 
