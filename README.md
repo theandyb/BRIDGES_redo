@@ -8,3 +8,10 @@ The point of this repository is to re-do my analyses of the germline mutation ra
 # Step 1: Generate singleton files
 
 For this step we simply rely on the vcftools `--singletons` option. This is done via a batch script (`src/step1_get_singletons_batch.sh`). We also need to filter out the subjects that were excluded in Carlson, et al (2017); this I'll do via an R script (`src/step1_filter_subjects.R`) 
+
+# Step 2: Annotate singletons
+
+For this step, we will loop over all the singletons and pull the 21-mer motif centered at each position
+
+# Step 3: Sample control distribution
+
