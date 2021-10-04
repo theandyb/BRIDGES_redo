@@ -4,3 +4,4 @@ reference_data/*
 *.out
 src/slurm
 .ipynb_checkpoints
+notebooks
