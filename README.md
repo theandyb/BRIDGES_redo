@@ -5,13 +5,34 @@ The point of this repository is to re-do my analyses of the germline mutation ra
 1. I'd like to stream-line the pipeline as much as possible. While a tool like snakemake would ensure this, for now I'm going to maintain a connected set of "steps" encoded in scripts to generate my results. (I really should learn snakemake though).
 2. If I get run over by a bus, someone else should be able to read this document, and based on that (and access to the data) they should be able to reproduce my results.
 
+# Step 0: Directory Structure
+
+```{bash}
+
+mkdir output
+mkdir output/control
+mkdir output/control/at
+mkdir output/control/gc
+mkdir output/control2
+mkdir output/control2/at
+mkdir output/control2/gc
+mkdir output/gw_1_count
+mkdir output/gw_1_count/cpg
+mkdir output/gw_2_count
+mkdir output/gw_2_count/at
+mkdir output/gw_2_count/cpg
+mkdir output/single_pos_df
+mkdir output/singletons
+
+```
+
 # Step 1: Generate singleton files
 
 For this step we simply rely on the vcftools `--singletons` option. This is done via a batch script (`src/step1_get_singletons_batch.sh`). We also need to filter out the subjects that were excluded in Carlson, et al (2017); this I'll do via an R script (`src/step1_filter_subjects.R`) 
 
 # Step 2: Annotate singletons
 
-For this step, we will loop over all the singletons and pull the 21-mer motif centered at each position. We do this in two stages; first, we run `step2_append_motif.py` to annotate each position with the 21-mer motif and the simple subtype. We then run `step2_additional_anno.R` to take reverse-complement (when necessary) and produce the "full" subtype (i.e. A>C is now AT>CG, C>T is now GC>AT, etc).
+For this step, we will loop over all the singletons and pull the 21-mer motif centered at each position. We do this in two stages; first, we run `step2_append_motif.py` to annotate each position with the 21-mer motif and the simple subtype. We then run `step2_additional_anno.R` to take reverse-complement (when necessary) and produce the "full" sub-type (i.e. A>C is now AT>CG, C>T is now GC>AT, etc).
 
 The batch scripts for this step are `step2_annotate_singletons.sh` and `step2_1_additional_anno_batch.sh`
 
@@ -52,4 +73,4 @@ We also would like the C (and G) counts for CpG and non-CpGs separately. This is
 
 This is similar to step 5, but here we stratify counts based on the nucleotides at all pairs of flanking positions in the +/- 10 bp window. Here we don't worry about taking reverse complements while generating the counts (i.e. for each pair of positions we'll have 4 tables instead of 2).
 
-The batch scripts for generating the counts are `step6_GC_GW_batch.sh` and `step6_AT_GW_batch.sh`
+The batch scripts for generating the counts are `step6_GC_GW_batch.sh` and `step6_AT_GW_batch.sh`. The script `step6_generate_model_tables.R` then creates the tables we need to fit the models at each pair of positions for the 9 subtypes.
