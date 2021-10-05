@@ -45,3 +45,11 @@ For this analysis, we employ a sliding-window approach to generate the 20 count 
     * Lookup count for nucleotide x in table ix and add 1
     
 The batch script to generate the counts for each chromosome and rp is `step5_gw_1_count_batch.sh`. An R script to combine results across chromosomes (`step5_add_chromosome.R`) is also in the src directory.
+
+We also would like the C (and G) counts for CpG and non-CpGs separately. This is done by the batch script `step5_cpg_gw_batch.sh` (note: the script it calls does not perform the reverse-complement opperation, and yields 4 tables: CpG-C, CpG-G, C, and G). This is done by the batch script `step5_cpg_gw_batch.sh`
+
+# Step 6: Get genome-wide rates for 2 position models
+
+This is similar to step 5, but here we stratify counts based on the nucleotides at all pairs of flanking positions in the +/- 10 bp window. Here we don't worry about taking reverse complements while generating the counts (i.e. for each pair of positions we'll have 4 tables instead of 2).
+
+The batch scripts for generating the counts are `step6_GC_GW_batch.sh` and `step6_AT_GW_batch.sh`
