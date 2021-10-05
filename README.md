@@ -46,7 +46,7 @@ For this analysis, we employ a sliding-window approach to generate the 20 count 
     
 The batch script to generate the counts for each chromosome and rp is `step5_gw_1_count_batch.sh`. An R script to combine results across chromosomes (`step5_add_chromosome.R`) is also in the src directory.
 
-We also would like the C (and G) counts for CpG and non-CpGs separately. This is done by the batch script `step5_cpg_gw_batch.sh` (note: the script it calls does not perform the reverse-complement opperation, and yields 4 tables: CpG-C, CpG-G, C, and G). This is done by the batch script `step5_cpg_gw_batch.sh`
+We also would like the C (and G) counts for CpG and non-CpGs separately. This is done by the batch script `step5_cpg_gw_batch.sh` (note: the script it calls does not perform the reverse-complement opperation, and yields 4 tables: CpG-C, CpG-G, C, and G). This is done by the batch script `step5_cpg_gw_batch.sh`. This generates per-chromosome files, which we then combine using the script `step5_cpg_combine_chrom.R`.
 
 # Step 6: Get genome-wide rates for 2 position models
 
