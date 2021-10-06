@@ -26,6 +26,16 @@ mkdir output/singletons
 
 ```
 
+# Step 0.5: Setting up an environment
+
+```{bash}
+# assuming you've install mambaforge 
+# https://mamba.readthedocs.io/en/latest/installation.html
+
+mamba create -n bridges pyfaidx r-base r-tidyverse pandas -c conda-forge -c bioconda
+
+```
+
 # Step 1: Generate singleton files
 
 For this step we simply rely on the vcftools `--singletons` option. This is done via a batch script (`src/step1_get_singletons_batch.sh`). We also need to filter out the subjects that were excluded in Carlson, et al (2017); this I'll do via an R script (`src/step1_filter_subjects.R`) 
@@ -74,3 +84,7 @@ We also would like the C (and G) counts for CpG and non-CpGs separately. This is
 This is similar to step 5, but here we stratify counts based on the nucleotides at all pairs of flanking positions in the +/- 10 bp window. Here we don't worry about taking reverse complements while generating the counts (i.e. for each pair of positions we'll have 4 tables instead of 2).
 
 The batch scripts for generating the counts are `step6_GC_GW_batch.sh` and `step6_AT_GW_batch.sh`. The script `step6_generate_model_tables.R` then creates the tables we need to fit the models at each pair of positions for the 9 subtypes.
+
+# Step 7: Generate Single Position Model Tables
+
+For each sub-type, we aggregate all the data needed to fit the models at each flanking position. Each position will have a table, and each nucleotide will have a value for singleton counts, control distribution counts, and genome-wide counts. We will also compute expectations for the singletons based on rates from the control and genome-wide counts, and use these expectations to compute chi-square residuals (which we can then sum across the nucleotides to obtain the chi-square goodness of fit statistic for that position).

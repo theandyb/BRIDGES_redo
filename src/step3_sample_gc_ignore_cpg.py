@@ -81,9 +81,11 @@ def sample_control(chrom, pos, ref, cat, seq, nSample, seqstr, window=150, bp=10
         if ((flip == 0 and len(sites1)>0) or (len(sites2)==0)):
             subseq = subseq1
             sites = sites1
+            c_direction = -1
         else:
             subseq = subseq2
             sites = sites2
+            c_direction = 1
         if(len(sites)==0):
             print("Bad pos: {}".format(pos))
         ix = random.choice(sites)
@@ -93,13 +95,15 @@ def sample_control(chrom, pos, ref, cat, seq, nSample, seqstr, window=150, bp=10
             sites.remove(ix)
             ix = random.choice(sites)
             newSeq = subseq[(ix - bp):(ix+bp+1)]
+        distance = ix + (c_direction * (window + bp))
         entry = {
             'chrom' : chrom,
             'pos' : pos,
             'motif' : newSeq,
             'cat': cat,
             'ref': ref,
-            'window': window
+            'window': window,
+            'distance': distance
         }
         newlist.append(entry)
         if ((flip == 0 and len(sites1)>0) or (len(sites2)==0)):

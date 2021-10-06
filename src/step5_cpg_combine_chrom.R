@@ -34,7 +34,7 @@ for(status in c("cpg", "non")){
   for(nuc in c("c", "g")){
     for(rp in c(-10:-1,1:10)){
       df <- load_cpg_nuc_rp_all(nuc, rp, status)
-      write_csv(df, paste0(data_dir, status, "_rp", rp, ".csv"))
+      write_csv(df, paste0(data_dir, status, "_", nuc, "_rp", rp, ".csv"))
     }
   }
 }

@@ -30,12 +30,12 @@ print(paste0("Input: ", fname))
 print(paste0("Output: ", oname))
 
 df <- read_csv(fname,
-              col_names = c("chrom", "pos", "motif", "subtype", "alt","window"),
+              col_names = c("chrom", "pos", "motif", "subtype", "alt","window","distance"),
               col_types = cols())
 df <- df %>% 
     mutate(center = str_sub(motif,11,11)) %>%
     mutate(motif2 = ifelse(center %in% c("A","C"), motif, rc(motif))) %>%
-    select(chrom, pos, motif2, subtype, window) %>%
+    select(chrom, pos, motif2, subtype, window, distance) %>%
     rename(motif = motif2)
 
 write_csv(df, oname)

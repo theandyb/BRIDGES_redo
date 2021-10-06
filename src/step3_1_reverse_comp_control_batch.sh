@@ -4,7 +4,7 @@
 #SBATCH --ntasks=1
 #SBATCH --mem=12GB
 #SBATCH --time=01:30:00
-#SBATCH --job-name=addGC
+#SBATCH --job-name=rc_igCpG
 #SBATCH --partition=nomosix
 #SBATCH --array=1-22
 #SBATCH --requeue
