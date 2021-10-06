@@ -88,9 +88,11 @@ def sample_control(chrom, pos, ref, cat, seq, nSample, cpg_bool, seqstr, window=
         if ((flip == 0 and len(sites1)>0) or (len(sites2)==0)):
             subseq = subseq1
             sites = sites1
+            c_direction = -1 # used for calculating distance between singleton and sampled control
         else:
             subseq = subseq2
             sites = sites2
+            c_direction = 1
         if(len(sites)==0):
             print("Bad pos: {}".format(pos))
         ix = random.choice(sites)
@@ -108,13 +110,15 @@ def sample_control(chrom, pos, ref, cat, seq, nSample, cpg_bool, seqstr, window=
             else:
                 shift = 1
             newSeq = subseq[(ix - bp + shift):(ix+bp+1+shift)]
+        distance = ix + (c_direction * (window + bp))
         entry = {
             'chrom' : chrom,
             'pos' : pos,
             'motif' : newSeq,
             'cat': cat,
             'ref': ref,
-            'window': window
+            'window': window,
+            'distance': distance
         }
         if(len(newSeq) == 20):
             print("shift = {}, coords {},{} ".format(shift, (ix-bp+shift),(ix+bp+1+shift)))
