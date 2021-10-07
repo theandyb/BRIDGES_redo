@@ -92,7 +92,10 @@ def sample_control(chrom, pos, ref, cat, seq, nSample, window=150, bp=10):
             sites.remove(ix)
             ix = random.choice(sites)
             newSeq = subseq[(ix - bp):(ix+bp+1)]
-        distance = ix + (c_direction * (window + bp))
+        if c_direction == -1:
+            distance = window + bp - ix
+        else:
+            distance = window + ix
         entry = {
             'chrom' : chrom,
             'pos' : pos,

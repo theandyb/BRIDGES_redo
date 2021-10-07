@@ -85,8 +85,8 @@ def sample_control(chrom, pos, ref, cat, seq, nSample, cpg_bool, seqstr, window=
         subseq2 = re.sub(r'N+$', '', subseq2)
         sites1 = [m.start() for m in re.finditer(search_str, subseq1, overlapped=True)] # These two lines were changed for CpG/non-CpG sampling
         sites2 = [m.start() for m in re.finditer(search_str, subseq2, overlapped=True)]
-        sites1 = [s for s in sites1 if (s >= bp and s < (len(subseq1)-bp))] # Identify all possible motifs to sample from
-        sites2 = [s for s in sites2 if (s >= bp and s < (len(subseq2)-bp))]
+        sites1 = [s for s in sites1 if (s >= bp+1 and s < (len(subseq1)-bp-1))] # Identify all possible motifs to sample from
+        sites2 = [s for s in sites2 if (s >= bp+1 and s < (len(subseq2)-bp-1))]
         window += 50 #expand window in edge case where mut_site is only ref_allele in window
     window -= 50
     while len(newlist) < nSample:
@@ -94,9 +94,11 @@ def sample_control(chrom, pos, ref, cat, seq, nSample, cpg_bool, seqstr, window=
         if ((flip == 0 and len(sites1)>0) or (len(sites2)==0)):
             subseq = subseq1
             sites = sites1
+            c_direction = -1
         else:
             subseq = subseq2
             sites = sites2
+            c_direction = 1
         if(len(sites)==0):
             print("Bad pos: {}".format(pos))
         ix = random.choice(sites)
@@ -104,7 +106,7 @@ def sample_control(chrom, pos, ref, cat, seq, nSample, cpg_bool, seqstr, window=
             newSeq = subseq[(ix - bp):(ix+bp+1)]
         else:
             newSeq = subseq[(ix + 1 - bp):(ix+bp+2)]
-        while not re.search("[ATCG]{11}", newSeq): # THIS CHANGED!
+        while not re.search("[NATCG]{21}", newSeq): # THIS CHANGED!
             #print(pos)
             sites.remove(ix)
             ix = random.choice(sites)
@@ -112,13 +114,18 @@ def sample_control(chrom, pos, ref, cat, seq, nSample, cpg_bool, seqstr, window=
                 newSeq = subseq[(ix - bp):(ix+bp+1)]
             else: 
                 newSeq = subseq[(ix + 1 - bp):(ix+bp+2)]
+        if c_direction == -1:
+            distance = window + bp - ix
+        else:
+            distance = window + ix
         entry = {
             'chrom' : chrom,
             'pos' : pos,
             'motif' : newSeq,
             'cat': cat,
             'ref': ref,
-            'window': window
+            'window': window,
+            'distance': distance
         }
         newlist.append(entry)
         if ((flip == 0 and len(sites1)>0) or (len(sites2)==0)):

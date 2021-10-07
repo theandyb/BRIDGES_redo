@@ -110,7 +110,10 @@ def sample_control(chrom, pos, ref, cat, seq, nSample, cpg_bool, seqstr, window=
             else:
                 shift = 1
             newSeq = subseq[(ix - bp + shift):(ix+bp+1+shift)]
-        distance = ix + (c_direction * (window + bp))
+        if c_direction == -1:
+            distance = window + bp - ix
+        else:
+            distance = window + ix
         entry = {
             'chrom' : chrom,
             'pos' : pos,

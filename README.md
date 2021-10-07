@@ -32,7 +32,7 @@ mkdir output/singletons
 # assuming you've install mambaforge 
 # https://mamba.readthedocs.io/en/latest/installation.html
 
-mamba create -n bridges pyfaidx r-base r-tidyverse pandas -c conda-forge -c bioconda
+mamba create -n bridges pyfaidx r-base r-tidyverse pandas r-doparallel r-writexl regex biopython -c conda-forge -c bioconda
 
 ```
 
@@ -48,7 +48,7 @@ The batch scripts for this step are `step2_annotate_singletons.sh` and `step2_1_
 
 # Step 3: Sample control distribution
 
-I do this two different ways; the first I match only by the REF allele; these results are in the `output/count/` directory. The second approach, which I think is more correct, is to match As and Ts to either As or Ts; CpGs are matched to CG, but we allow for either the "C position" or the "G position" to be the center of the motif (in the latter, the reverse-complement has a CpG at the center); non-CpGs are matched to either \[ACT\]C\[ACT\] or \[AGT\]G\[AGT\] (that is, non-CpGs). The latter samples are stored in `output/control2`
+I do this two different ways; the first I match only by the REF allele; these results are in the `output/count/` directory. The second approach, which I **no longer** think is more correct, is to match As and Ts to either As or Ts; CpGs are matched to CG, but we allow for either the "C position" or the "G position" to be the center of the motif (in the latter, the reverse-complement has a CpG at the center); non-CpGs are matched to either \[ACT\]C\[ACT\] or \[AGT\]G\[AGT\] (that is, non-CpGs). The latter samples are stored in `output/control2`
 
 The batch scripts for approach 1 are `step3_sample_gc_batch.sh` and `step3_sample_at_batch.sh`
 
@@ -56,7 +56,7 @@ The batch scripts for approach 2 are `step3_sample_gc_batch_2.sh` and `step3_sam
 
 I also do a version of the sampling where I match all GC_ mutations to any C or G in the reference genome (ignoring CpG status). This should allow me to demonstrate the known CpG effect at the +1.
 
-We then need to do similar processing with these motifs, since we'll want to take reverse-complements when the center is either a G or T. The batch script for this procedure is `step3_1_reverse_comp_control.sh`. Note that this was done in R, and a simple re-write in python would likely yield a script that runs much faster.
+We then need to do similar processing with these motifs, since we'll want to take reverse-complements when the center is either a G or T. The batch script for this procedure is `step3_1_reverse_comp_control.sh`.
 
 # Step 4: Per-chromosome files -> per subtype files
 
@@ -88,3 +88,5 @@ The batch scripts for generating the counts are `step6_GC_GW_batch.sh` and `step
 # Step 7: Generate Single Position Model Tables
 
 For each sub-type, we aggregate all the data needed to fit the models at each flanking position. Each position will have a table, and each nucleotide will have a value for singleton counts, control distribution counts, and genome-wide counts. We will also compute expectations for the singletons based on rates from the control and genome-wide counts, and use these expectations to compute chi-square residuals (which we can then sum across the nucleotides to obtain the chi-square goodness of fit statistic for that position).
+
+This is done by the script `step7_single_position_models.R`
