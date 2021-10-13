@@ -13,4 +13,3 @@
 
 echo "GC ${SLURM_ARRAY_TASK_ID}"
 python /net/snowwhite/home/beckandy/research/BRIDGES_redo/src/step3_sample_at.py -s /net/snowwhite/home/beckandy/research/BRIDGES_redo/output/singletons/chr${SLURM_ARRAY_TASK_ID}_filtered_annotated_addl.csv -f /net/snowwhite/home/beckandy/research/BRIDGES_redo/reference_data/human_g1k_v37.fasta -o /net/snowwhite/home/beckandy/research/BRIDGES_redo/output/control/at/chr${SLURM_ARRAY_TASK_ID}.csv -n 5 ${SLURM_ARRAY_TASK_ID}
-

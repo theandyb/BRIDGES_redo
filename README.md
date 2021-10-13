@@ -90,3 +90,7 @@ The batch scripts for generating the counts are `step6_GC_GW_batch.sh` and `step
 For each sub-type, we aggregate all the data needed to fit the models at each flanking position. Each position will have a table, and each nucleotide will have a value for singleton counts, control distribution counts, and genome-wide counts. We will also compute expectations for the singletons based on rates from the control and genome-wide counts, and use these expectations to compute chi-square residuals (which we can then sum across the nucleotides to obtain the chi-square goodness of fit statistic for that position).
 
 This is done by the script `step7_single_position_models.R`
+
+# Step 8: Generate Two Position Count Tables
+
+For each sub-type and pair of positions, we obtain the 16 counts for the singletons, controls, and genome-wide background rate. This is done by the script `step8_2pos_batch.sh`
