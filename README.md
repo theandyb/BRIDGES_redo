@@ -43,19 +43,20 @@ For this step we simply rely on the vcftools `--singletons` option. This is done
 
 # Step 2: Annotate singletons
 
+The script which appends each singleton with its motif is `src/append_motif.py`, and the batch script `step2_annotate_batch.sh` will submit slurm jobs for each chromosome. The output files will be headerless csvs with the following columns:
 
+1. Chromosome
+2. Position
+3. Original Motif
+4. Simple subtype (REF>ALT)
+5. ALT
+6. Sample ID
+7. REF
+8. Full Motif (motif and its reverse complement)
+9. Condensed sub-type
 
 # Step 3: Sample control distribution
 
-I do this two different ways; the first I match only by the REF allele; these results are in the `output/count/` directory. The second approach, which I **no longer** think is more correct, is to match As and Ts to either As or Ts; CpGs are matched to CG, but we allow for either the "C position" or the "G position" to be the center of the motif (in the latter, the reverse-complement has a CpG at the center); non-CpGs are matched to either \[ACT\]C\[ACT\] or \[AGT\]G\[AGT\] (that is, non-CpGs). The latter samples are stored in `output/control2`
-
-The batch scripts for approach 1 are `step3_sample_gc_batch.sh` and `step3_sample_at_batch.sh`
-
-The batch scripts for approach 2 are `step3_sample_gc_batch_2.sh` and `step3_sample_at_batch_2.sh`
-
-I also do a version of the sampling where I match all GC_ mutations to any C or G in the reference genome (ignoring CpG status). This should allow me to demonstrate the known CpG effect at the +1.
-
-We then need to do similar processing with these motifs, since we'll want to take reverse-complements when the center is either a G or T. The batch script for this procedure is `step3_1_reverse_comp_control.sh`.
 
 # Step 4: Per-chromosome files -> per subtype files
 
