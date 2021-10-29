@@ -4,11 +4,11 @@
 #SBATCH --ntasks=1
 #SBATCH --mem=2GB
 #SBATCH --time=06:00:00
-#SBATCH --job-name=gw_1_count
+#SBATCH --job-name=gw_1_3
 #SBATCH --partition=nomosix
 #SBATCH --array=1-22
 #SBATCH --requeue
 #SBATCH -e slurm/step5_1-%J.err
 #SBATCH -o slurm/step5_1-%J.out
 
-python /net/snowwhite/home/beckandy/research/BRIDGES_redo/src/step5_gw_1_count.py ${SLURM_ARRAY_TASK_ID}
+python /net/snowwhite/home/beckandy/research/BRIDGES_redo/src/gw_1_count_3cats.py ${SLURM_ARRAY_TASK_ID}
