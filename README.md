@@ -23,6 +23,7 @@ mkdir output/gw_2_count/at
 mkdir output/gw_2_count/cpg
 mkdir output/single_pos_df
 mkdir output/singletons
+mkdir output/all_count_2_pos
 
 ```
 
@@ -38,13 +39,11 @@ mamba create -n bridges pyfaidx r-base r-tidyverse pandas r-doparallel r-writexl
 
 # Step 1: Generate singleton files
 
-For this step we simply rely on the vcftools `--singletons` option. This is done via a batch script (`src/step1_get_singletons_batch.sh`). We also need to filter out the subjects that were excluded in Carlson, et al (2017); this I'll do via an R script (`src/step1_filter_subjects.R`) 
+For this step we simply rely on the vcftools `--singletons` option. This is done via a batch script (`src/step1_get_singletons_batch.sh`).
 
 # Step 2: Annotate singletons
 
-For this step, we will loop over all the singletons and pull the 21-mer motif centered at each position. We do this in two stages; first, we run `step2_append_motif.py` to annotate each position with the 21-mer motif and the simple subtype. We then run `step2_additional_anno.R` to take reverse-complement (when necessary) and produce the "full" sub-type (i.e. A>C is now AT>CG, C>T is now GC>AT, etc).
 
-The batch scripts for this step are `step2_annotate_singletons.sh` and `step2_1_additional_anno_batch.sh`
 
 # Step 3: Sample control distribution
 
