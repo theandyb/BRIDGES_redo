@@ -94,29 +94,13 @@ awk -F, '{if($4 == "cpg_GC_TA")print(substr($8,1,21))}' chr*_gc.csv > cpg_GC_TA.
 awk -F, '{if($4 == "cpg_GC_CG")print(substr($8,1,21))}' chr*_gc.csv> cpg_GC_CG.txt
 ```
 
-# Step 5: Get genome-wide rates for single position models
+# Step 5: Genome-wide Background Rates - Single Position Models
 
-For this analysis, we employ a sliding-window approach to generate the 20 count tables used for each sub-type. Iterating over each position in the genome:
+The scripts to generate counts based on the reference genome are `gw_1_count3cats.py` and `gw_1_count_6cats.py`. Batch scripts to submit jobs to slurm are `step5_gw_1_count_3cat_batch.sh` and `step5_gw_1_count_6cat_batch.sh`.
 
-1. Is the nucleotide in the set \{A,C,G,T\}? If not, move to next position
-2. Is the nucleotide an A or C? If so, set switch = 1, if not set switch = -1
-3. For all relative positions in -10:-1, 1:10
-    * Get x, the nucleotide at position rp from current nucleotide
-    * If x is not in the set \{A,C,G,T\} move to next rp
-    * If switch = -1, set x = rc(x), where rc is the reverse-complement map
-    * Table index ix = rp * direction (i.e. if we're taking reverse-complement, -10 is now +10, etc)
-    * Lookup count for nucleotide x in table ix and add 1
-    
-The batch script to generate the counts for each chromosome and rp is `step5_gw_1_count_batch.sh`. An R script to combine results across chromosomes (`step5_add_chromosome.R`) is also in the src directory.
+# Step 6: Genome-wide Background Rates - Two Postion Models
 
-We also would like the C (and G) counts for CpG and non-CpGs separately. This is done by the batch script `step5_cpg_gw_batch.sh` (note: the script it calls does not perform the reverse-complement opperation, and yields 4 tables: CpG-C, CpG-G, C, and G). This is done by the batch script `step5_cpg_gw_batch.sh`. This generates per-chromosome files, which we then combine using the script `step5_cpg_combine_chrom.R`.
-
-# Step 6: Get genome-wide rates for 2 position models
-
-This is similar to step 5, but here we stratify counts based on the nucleotides at all pairs of flanking positions in the +/- 10 bp window. Here we don't worry about taking reverse complements while generating the counts (i.e. for each pair of positions we'll have 4 tables instead of 2).
-
-The batch scripts for generating the counts are `step6_GC_GW_batch.sh` and `step6_AT_GW_batch.sh`. The script `step6_generate_model_tables.R` then creates the tables we need to fit the models at each pair of positions for the 9 subtypes.
-
+The script to generate counts based on the reference genome is `gw_2_count_6cats.py`, with batch script to submit jobs to slurm `step6_gw_2_6cats.sh`.
 # Step 7: Generate Single Position Model Tables
 
 For each sub-type, we aggregate all the data needed to fit the models at each flanking position. Each position will have a table, and each nucleotide will have a value for singleton counts, control distribution counts, and genome-wide counts. We will also compute expectations for the singletons based on rates from the control and genome-wide counts, and use these expectations to compute chi-square residuals (which we can then sum across the nucleotides to obtain the chi-square goodness of fit statistic for that position).
