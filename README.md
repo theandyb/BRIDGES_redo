@@ -98,6 +98,9 @@ awk -F, '{if($4 == "cpg_GC_CG")print(substr($8,1,21))}' chr*_gc.csv> cpg_GC_CG.t
 
 The scripts to generate counts based on the reference genome are `gw_1_count3cats.py` and `gw_1_count_6cats.py`. Batch scripts to submit jobs to slurm are `step5_gw_1_count_3cat_batch.sh` and `step5_gw_1_count_6cat_batch.sh`.
 
+After this, run the script `step5_combine_chromosomes.R` to combine the per-chromosome per-reference files into per-reference files.
+
+
 # Step 6: Genome-wide Background Rates - Two Postion Models
 
 The script to generate counts based on the reference genome is `gw_2_count_6cats.py`, with batch script to submit jobs to slurm `step6_gw_2_6cats.sh`.

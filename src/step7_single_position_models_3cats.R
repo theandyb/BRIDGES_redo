@@ -28,45 +28,15 @@ get_singleton_pos <- function(subtype, rp){
 
 #' Get nucleotide counts at position relative to control observation
 #' 
-#' @param subtype One of the nine basic subtypes
+#' @param subtype One of the 18 basic subtypes
 #' @param rp Position relative to focal site to get counts for
 #' @return Data.frame with control counts stratified by nucleotide at flanking position
-get_control_new_pos <- function(subtype, rp){
-  nucs <- c("A", "C", "G", "T")
-  
-  pos <- rp + 11
-  
-  if(str_starts(subtype, "AT")){
-    control_dir <- "/net/snowwhite/home/beckandy/research/BRIDGES_redo/output/control2/at/"
-  } else {
-    control_dir <- "/net/snowwhite/home/beckandy/research/BRIDGES_redo/output/control2/gc/"
-  }
-  fName <- paste0(control_dir, subtype, ".txt")
-  
-  awk_cmd <- paste0("awk '{count[substr($1,", pos,", 1)]++}END{for(key in count) print(key, \"\\t\", count[key])}' ",
-                    fName)
-  
-  df <- vroom::vroom(pipe(awk_cmd), col_names = c("Nuc", "controls"), delim = "\t", show_col_types = FALSE) %>%
-    filter(Nuc %in% nucs) %>%
-    rename(controls_2 = controls)
-  return(df)
-}
+get_control_pos <- function(subtype, rp){
 
-#' Get nucleotide counts at position relative to control observation
-#' 
-#' @param subtype One of the nine basic subtypes
-#' @param rp Position relative to focal site to get counts for
-#' @return Data.frame with control counts stratified by nucleotide at flanking position
-get_control_old_pos <- function(subtype, rp){
   nucs <- c("A", "C", "G", "T")
-  
   pos <- rp + 11
   
-  if(str_starts(subtype, "AT")){
-    control_dir <- "/net/snowwhite/home/beckandy/research/BRIDGES_redo/output/control/at/"
-  } else {
-    control_dir <- "/net/snowwhite/home/beckandy/research/BRIDGES_redo/output/control/gc/"
-  }
+  control_dir <- "/net/snowwhite/home/beckandy/research/BRIDGES_redo/output/controls/"
   fName <- paste0(control_dir, subtype, ".txt")
   
   awk_cmd <- paste0("awk '{count[substr($1,", pos,", 1)]++}END{for(key in count) print(key, \"\\t\", count[key])}' ",
@@ -77,20 +47,15 @@ get_control_old_pos <- function(subtype, rp){
   return(df)
 }
 
-#' Get genome-wide counts of nucleotides flanking A or C
+#' Get genome-wide counts of nucleotides flanking A or C (3 category version)
 #' 
 #' @param nucleotide Either A, cpg, or non
 #' @param rp Flanking position at which we stratify the genome-wide count of A or C
 #' @return data.frame with genome-wide counts of nucleotides flanking focal site
 get_gw_position <- function(nucleotide, rp){
   
-  data_dir <- "/net/snowwhite/home/beckandy/research/BRIDGES_redo/output/gw_1_count/"
-  
-  if(nucleotide == "A"){
-    f_name <- paste0(data_dir, nucleotide, "_rp", rp, ".csv")
-  } else {
-    f_name <- paste0(data_dir, "cpg/" , nucleotide, "_rp", rp, ".csv")
-  }
+  data_dir <- "/net/snowwhite/home/beckandy/research/BRIDGES_redo/output/gw_1_count/3cat/"
+  f_name <- paste0(data_dir, nucleotide, "_rp", rp, ".csv")
   df <- read_csv(f_name, col_types = cols())
   colnames(df) <- c("Nuc", "n_gw")
   return(df)
@@ -106,30 +71,25 @@ get_all_position <- function(subtype, rp){
   if(str_starts(subtype, "AT")){
     nuc <- "A"
   } else if(str_starts(subtype, "GC")){
-    nuc <- "non_c"
+    nuc <- "C"
   } else {
-    nuc <- "cpg_c"
+    nuc <- "cpg_C"
   }
   
   df_s <- get_singleton_pos(subtype, rp)
-  df_c <- get_control_old_pos(subtype, rp)
-  df_c_2 <- get_control_new_pos(subtype, rp)
+  df_c <- get_control_pos(subtype, rp)
   df_gw <- get_gw_position(nuc, rp)
   
   df <- full_join(df_s, df_c, by = "Nuc") %>%
-    full_join(df_c_2, by = "Nuc") %>%
     full_join(df_gw, by = "Nuc") %>%
-    replace_na(list("singletons" = 0, "controls" = 0, "controls_2" = 0, "n_gw" = 0)) %>%
+    replace_na(list("singletons" = 0, "controls" = 0, "n_gw" = 0)) %>%
     mutate(pct_gw = n_gw / sum(n_gw),
            pct_c = controls / sum(controls),
-           pct_c_2 = controls_2 / sum(controls_2),
            pct_s = singletons / sum(singletons)) %>%
     mutate(exp_gw = sum(singletons) * pct_gw,
-           exp_ct = sum(singletons) * pct_c,
-           exp_ct_2 = sum(singletons) * pct_c_2) %>%
+           exp_ct = sum(singletons) * pct_c) %>%
     mutate(chi_sq_gw = ((singletons - exp_gw)^2)/exp_gw,
-           chi_sq_ct = ((singletons - exp_ct)^2)/exp_ct,
-           chi_sq_ct_2 = ((singletons - exp_ct_2)^2)/exp_ct_2)
+           chi_sq_ct = ((singletons - exp_ct)^2)/exp_ct)
   
   df$rp <- rp
   return(df)
