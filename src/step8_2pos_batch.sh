@@ -9,8 +9,8 @@
 #SBATCH --partition=nomosix
 #SBATCH --array=1-9
 #SBATCH --requeue
-#SBATCH -e slurm/step7-%J.err
-#SBATCH -o slurm/step7-%J.out
+#SBATCH -e slurm/step8-%J.err
+#SBATCH -o slurm/step8-%J.out
 
 
-srun Rscript /net/snowwhite/home/beckandy/research/BRIDGES_redo/src/step8_2pos_counts.R ${SLURM_ARRAY_TASK_ID}
+Rscript /net/snowwhite/home/beckandy/research/BRIDGES_redo/src/2_pos_model_data.R ${SLURM_ARRAY_TASK_ID}

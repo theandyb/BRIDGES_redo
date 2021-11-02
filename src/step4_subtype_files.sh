@@ -26,24 +26,24 @@ awk -F, '{if($4 == "cpg_GC_CG")print(substr($8,1,21))}' chr*_gc.csv | sed 's/"//
 
 # 6 Category Versions
 # Singletons
-awk -F, '{if($4 == "A>C")print($4)}' chr*_annotated.csv > A_C.txt
-awk -F, '{if($4 == "A>G")print($4)}' chr*_annotated.csv > A_G.txt
-awk -F, '{if($4 == "A>T")print($4)}' chr*_annotated.csv > A_T.txt
-awk -F, '{if($4 == "T>A")print($4)}' chr*_annotated.csv > T_A.txt
-awk -F, '{if($4 == "T>C")print($4)}' chr*_annotated.csv > T_C.txt
-awk -F, '{if($4 == "T>G")print($4)}' chr*_annotated.csv > T_G.txt
-awk -F, '{if($4 == "C>A" && substr($9, 1, 3) == "cpg")print($4)}' chr*_annotated.csv > cpg_C_A.txt
-awk -F, '{if($4 == "C>G" && substr($9, 1, 3) == "cpg")print($4)}' chr*_annotated.csv > cpg_C_G.txt
-awk -F, '{if($4 == "C>T" && substr($9, 1, 3) == "cpg")print($4)}' chr*_annotated.csv > cpg_C_T.txt
-awk -F, '{if($4 == "C>A" && substr($9, 1, 3) != "cpg")print($4)}' chr*_annotated.csv > C_A.txt
-awk -F, '{if($4 == "C>G" && substr($9, 1, 3) != "cpg")print($4)}' chr*_annotated.csv > C_G.txt
-awk -F, '{if($4 == "C>T" && substr($9, 1, 3) != "cpg")print($4)}' chr*_annotated.csv > C_T.txt
-awk -F, '{if($4 == "G>A" && substr($9, 1, 3) == "cpg")print($4)}' chr*_annotated.csv > cpg_G_A.txt
-awk -F, '{if($4 == "G>C" && substr($9, 1, 3) == "cpg")print($4)}' chr*_annotated.csv > cpg_G_C.txt
-awk -F, '{if($4 == "G>T" && substr($9, 1, 3) == "cpg")print($4)}' chr*_annotated.csv > cpg_G_T.txt
-awk -F, '{if($4 == "G>A" && substr($9, 1, 3) != "cpg")print($4)}' chr*_annotated.csv > G_A.txt
-awk -F, '{if($4 == "G>C" && substr($9, 1, 3) != "cpg")print($4)}' chr*_annotated.csv > G_C.txt
-awk -F, '{if($4 == "G>T" && substr($9, 1, 3) != "cpg")print($4)}' chr*_annotated.csv > G_T.txt
+awk -F, '{if($4 == "A>C")print($3)}' chr*_annotated.csv > A_C.txt
+awk -F, '{if($4 == "A>G")print($3)}' chr*_annotated.csv > A_G.txt
+awk -F, '{if($4 == "A>T")print($3)}' chr*_annotated.csv > A_T.txt
+awk -F, '{if($4 == "T>A")print($3)}' chr*_annotated.csv > T_A.txt
+awk -F, '{if($4 == "T>C")print($3)}' chr*_annotated.csv > T_C.txt
+awk -F, '{if($4 == "T>G")print($3)}' chr*_annotated.csv > T_G.txt
+awk -F, '{if($4 == "C>A" && substr($9, 1, 3) == "cpg")print($3)}' chr*_annotated.csv > cpg_C_A.txt
+awk -F, '{if($4 == "C>G" && substr($9, 1, 3) == "cpg")print($3)}' chr*_annotated.csv > cpg_C_G.txt
+awk -F, '{if($4 == "C>T" && substr($9, 1, 3) == "cpg")print($3)}' chr*_annotated.csv > cpg_C_T.txt
+awk -F, '{if($4 == "C>A" && substr($9, 1, 3) != "cpg")print($3)}' chr*_annotated.csv > C_A.txt
+awk -F, '{if($4 == "C>G" && substr($9, 1, 3) != "cpg")print($3)}' chr*_annotated.csv > C_G.txt
+awk -F, '{if($4 == "C>T" && substr($9, 1, 3) != "cpg")print($3)}' chr*_annotated.csv > C_T.txt
+awk -F, '{if($4 == "G>A" && substr($9, 1, 3) == "cpg")print($3)}' chr*_annotated.csv > cpg_G_A.txt
+awk -F, '{if($4 == "G>C" && substr($9, 1, 3) == "cpg")print($3)}' chr*_annotated.csv > cpg_G_C.txt
+awk -F, '{if($4 == "G>T" && substr($9, 1, 3) == "cpg")print($3)}' chr*_annotated.csv > cpg_G_T.txt
+awk -F, '{if($4 == "G>A" && substr($9, 1, 3) != "cpg")print($3)}' chr*_annotated.csv > G_A.txt
+awk -F, '{if($4 == "G>C" && substr($9, 1, 3) != "cpg")print($3)}' chr*_annotated.csv > G_C.txt
+awk -F, '{if($4 == "G>T" && substr($9, 1, 3) != "cpg")print($3)}' chr*_annotated.csv > G_T.txt
 
 # Controls
 awk -F, '{if($4 == "AT_CG" && $5 == "A")print($3)}' chr*_at.csv > A_C.txt
