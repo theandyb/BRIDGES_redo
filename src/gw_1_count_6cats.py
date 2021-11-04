@@ -22,11 +22,6 @@ def count_string(nuc_string, window, result_tables):
       else:
         cat_prefix = ""
       direction = 1
-      #if nuc in ["A", "C"]:
-      #    direction = 1
-      #else:
-      #    direction = -1
-      #    nuc = rc_dict[nuc]
       for rp in range(-window,(window+1)):
           if rp == 0: 
               continue
