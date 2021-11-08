@@ -5,3 +5,6 @@ reference_data/*
 src/slurm
 .ipynb_checkpoints
 notebooks
+*.zip
+.Rhistory
+.Rproj.user
