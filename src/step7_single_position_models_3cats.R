@@ -6,28 +6,28 @@ library(doParallel)
 library(writexl)
 
 #' Get the singleton counts for a sub-type at a flanking position
-#' 
+#'
 #' @param subtype One of the nine simple sub types
 #' @param rp Relative position which to get singleton counts from
 #' @return data frame with counts for each nucleotide
 get_singleton_pos <- function(subtype, rp){
   nucs <- c("A", "C", "G", "T")
-  
+
   pos <- rp + 11
-  
+
   singleton_dir <- "/net/snowwhite/home/beckandy/research/BRIDGES_redo/output/singletons/"
   fName <- paste0(singleton_dir, subtype, ".txt")
-  
+
   awk_cmd <- paste0("awk '{count[substr($1,", pos,", 1)]++}END{for(key in count) print(key, \"\\t\", count[key])}' ",
                     fName)
-  
+
   df <- vroom::vroom(pipe(awk_cmd), col_names = c("Nuc", "singletons"), delim = "\t", show_col_types = FALSE) %>%
     filter(Nuc %in% nucs )
   return(df)
 }
 
 #' Get nucleotide counts at position relative to control observation
-#' 
+#'
 #' @param subtype One of the 18 basic subtypes
 #' @param rp Position relative to focal site to get counts for
 #' @return Data.frame with control counts stratified by nucleotide at flanking position
@@ -35,35 +35,35 @@ get_control_pos <- function(subtype, rp){
 
   nucs <- c("A", "C", "G", "T")
   pos <- rp + 11
-  
+
   control_dir <- "/net/snowwhite/home/beckandy/research/BRIDGES_redo/output/controls/"
   fName <- paste0(control_dir, subtype, ".txt")
-  
+
   awk_cmd <- paste0("awk '{count[substr($1,", pos,", 1)]++}END{for(key in count) print(key, \"\\t\", count[key])}' ",
                     fName)
-  
+
   df <- vroom::vroom(pipe(awk_cmd), col_names = c("Nuc", "controls"), delim = "\t", show_col_types = FALSE) %>%
     filter(Nuc %in% nucs)
   return(df)
 }
 
 #' Get genome-wide counts of nucleotides flanking A or C (3 category version)
-#' 
+#'
 #' @param nucleotide Either A, cpg, or non
 #' @param rp Flanking position at which we stratify the genome-wide count of A or C
 #' @return data.frame with genome-wide counts of nucleotides flanking focal site
 get_gw_position <- function(nucleotide, rp){
-  
+
   data_dir <- "/net/snowwhite/home/beckandy/research/BRIDGES_redo/output/gw_1_count/3cat/"
   f_name <- paste0(data_dir, nucleotide, "_rp", rp, ".csv")
   df <- read_csv(f_name, col_types = cols())
   colnames(df) <- c("Nuc", "n_gw")
   return(df)
-  
+
 }
 
 #' Get singleton, control, and genome-wide counts for a sub-type at a flanking position
-#' 
+#'
 #' @param subtype One of the nine basic sub-types
 #' @param rp Flanking position at which we stratify the genome-wide count of A or C
 #' @return data.frame with singleton, control, and genome-wide counts of nucleotides flanking focal site
@@ -75,11 +75,11 @@ get_all_position <- function(subtype, rp){
   } else {
     nuc <- "cpg_C"
   }
-  
+
   df_s <- get_singleton_pos(subtype, rp)
   df_c <- get_control_pos(subtype, rp)
   df_gw <- get_gw_position(nuc, rp)
-  
+
   df <- full_join(df_s, df_c, by = "Nuc") %>%
     full_join(df_gw, by = "Nuc") %>%
     replace_na(list("singletons" = 0, "controls" = 0, "n_gw" = 0)) %>%
@@ -90,10 +90,10 @@ get_all_position <- function(subtype, rp){
            exp_ct = sum(singletons) * pct_c) %>%
     mutate(chi_sq_gw = ((singletons - exp_gw)^2)/exp_gw,
            chi_sq_ct = ((singletons - exp_ct)^2)/exp_ct)
-  
+
   df$rp <- rp
   return(df)
-  
+
 }
 
 subtypes <- c("AT_CG", "AT_GC", "AT_TA",
@@ -129,7 +129,7 @@ names(excel_results) <- subtypes
 for(st in subtypes){
   df <- results[[st]]
   df_f <- df %>%
-    filter(rp == i) %>%
+    filter(rp == -10) %>%
     select(-rp) %>%
     select(Nuc, singletons, controls, n_gw, chi_sq_gw, chi_sq_ct) %>%
     gather(category, n, -Nuc)
