@@ -13,5 +13,5 @@
 #SBATCH -o slurm/step2_all-%J.out
 
 python append_motif.py -c ${SLURM_ARRAY_TASK_ID} \
--s /net/snowwhite/home/beckandy/research/BRIDGES_redo/output/singletons/chr${SLURM_ARRAY_TASK_ID}.txt.singletons \
+-s /net/snowwhite/home/beckandy/research/BRIDGES_redo/output/singletons/chr${SLURM_ARRAY_TASK_ID}.singletons \
 -o /net/snowwhite/home/beckandy/research/BRIDGES_redo/output/singletons/chr${SLURM_ARRAY_TASK_ID}_annotated.csv
