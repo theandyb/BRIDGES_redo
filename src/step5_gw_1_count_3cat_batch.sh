@@ -5,7 +5,6 @@
 #SBATCH --mem=2GB
 #SBATCH --time=06:00:00
 #SBATCH --job-name=gw_1_3
-#SBATCH --partition=nomosix
 #SBATCH --array=1-22
 #SBATCH --requeue
 #SBATCH -e slurm/step5_1-%J.err

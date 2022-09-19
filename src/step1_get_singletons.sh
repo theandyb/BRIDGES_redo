@@ -6,7 +6,6 @@
 #SBATCH --ntasks=1
 #SBATCH --time 12:00:00
 #SBATCH --job-name=step1
-#SBATCH --partition=nomosix
 #SBATCH --array=1-22
 #SBATCH --requeue
 #SBATCH -e slurm/step1_all-%J.err
