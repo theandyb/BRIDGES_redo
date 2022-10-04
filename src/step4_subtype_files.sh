@@ -24,6 +24,16 @@ awk -F, '{if($4 == "cpg_GC_AT")print(substr($8,1,21))}' chr*_gc.csv | sed 's/"//
 awk -F, '{if($4 == "cpg_GC_TA")print(substr($8,1,21))}' chr*_gc.csv | sed 's/"//g' > cpg_GC_TA.txt
 awk -F, '{if($4 == "cpg_GC_CG")print(substr($8,1,21))}' chr*_gc.csv | sed 's/"//g' > cpg_GC_CG.txt
 
+## Add: all_gc
+awk -F, '{if($4 == "GC_AT")print(substr($8,1,21))}' chr*_gc_all.csv | sed 's/"//g' > all_GC_AT.txt
+awk -F, '{if($4 == "GC_TA")print(substr($8,1,21))}' chr*_gc_all.csv | sed 's/"//g' > all_GC_TA.txt
+awk -F, '{if($4 == "GC_CG")print(substr($8,1,21))}' chr*_gc_all.csv | sed 's/"//g' > all_GC_CG.txt
+awk -F, '{if($4 == "cpg_GC_AT")print(substr($8,1,21))}' chr*_gc_all.csv | sed 's/"//g' >> all_GC_AT.txt
+awk -F, '{if($4 == "cpg_GC_TA")print(substr($8,1,21))}' chr*_gc_all.csv | sed 's/"//g' >> all_GC_TA.txt
+awk -F, '{if($4 == "cpg_GC_CG")print(substr($8,1,21))}' chr*_gc_all.csv | sed 's/"//g' >> all_GC_CG.txt
+
+
+
 # 6 Category Versions
 # Singletons
 awk -F, '{if($4 == "A>C")print($3)}' chr*_annotated.csv > A_C.txt

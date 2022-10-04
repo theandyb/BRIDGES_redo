@@ -149,3 +149,40 @@ for(st in subtypes){
 
 write_xlsx(excel_results, paste0(out_dir, "all_sp_bridges.xlsx"))
 
+# Addendum
+all_GC_data <- function(rp, st){
+  st_cpg <- paste0("cpg_", st)
+  df_s1 <- get_singleton_pos(st, rp)
+  df_s2 <- get_singleton_pos(st_cpg, rp)
+  df_s <- bind_rows(df_s1, df_s2)
+
+  df_c <- get_control_pos(paste0("all_", st), rp)
+  df <- full_join(df_s, df_c, by = "Nuc") %>%
+    mutate(p_c = controls / sum(controls)) %>%
+    mutate(exp_s = sum(singletons) * p_c) %>%
+    mutate(chi_s = (exp_s - singletons)^2 / exp_s)
+  df$rp <- rp
+  return(df)
+}
+
+
+
+for(st in c("GC_AT", "GC_TA", "GC_CG")){
+  print(st)
+  registerDoParallel(20)
+  results <- foreach(x = c(-10:-1,1:10), .combine = 'rbind') %dopar% {
+    all_GC_data(x, st)
+  }
+  stopImplicitCluster()
+
+  out_dir <- "/net/snowwhite/home/beckandy/research/BRIDGES_redo/output/single_pos_df/"
+  df <- results
+  for(i in c(-10:-1,1:10)){
+    df2 <- df %>%
+      filter(rp == i) %>%
+      select(-rp)
+    out_file <- paste0(out_dir, "all_", st, "_rp", i, ".csv")
+    write_csv(df2, out_file)
+  }
+}
+
