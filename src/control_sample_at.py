@@ -28,6 +28,12 @@ def main(ref_prefix = ""):
     chrom = args.chrom
     nSample = args.nSample
     output_list = []
+    # Addition: 10-Nov-22
+    out_file = args.output
+    min_file = out_file + ".min"
+    max_file = out_file + ".max"
+    min_list = []
+    max_list = []
     # Create fasta object
     print("Reading fasta...")
     fasta_obj = Fasta(ref_file)
@@ -49,17 +55,34 @@ def main(ref_prefix = ""):
             if(not cat.startswith("A")):
                 line = fp.readline()
                 continue
-            output_list.extend(sample_control(chrom, pos, ref, cat, seqstr, nSample))
+            new_entry = sample_control(chrom, pos, ref, cat, seqstr, nSample)
+            # New: get control nearest and further from singleton
+            
+            output_list.extend(new_entry)
+            # Find control with minimum and maximum distance
+            min_dist = min([t.get("distance") for t in new_entry])
+            max_dist = max([t.get("distance") for t in new_entry])
+            min_entry = [t for t in new_entry if t.get('distance') == min_dist]
+            max_entry = [t for t in new_entry if t.get('distance') == max_dist ]
+            min_list.extend(min_entry)
+            max_list.extend(max_entry)
             line = fp.readline()
             counter += 1
             if counter % 10000 == 0:
                 print(counter)
                 df = pd.DataFrame(output_list)
-                df.to_csv(args.output, index = None, header=False, mode='a')
+                df.to_csv(out_file, index = None, header=False, mode='a')
                 output_list = []
+                # New: add min and max files
+                pd.DataFrame(min_list).to_csv(min_file, index = None, header=False, mode='a')
+                min_list = []
+                pd.DataFrame(max_list).to_csv(max_file, index = None, header=False, mode='a')
+                max_list = []
     print("Done sampling...")
     if output_list:
-        pd.DataFrame(output_list).to_csv(args.output, index = None, header=False, mode='a')
+        pd.DataFrame(output_list).to_csv(out_file, index = None, header=False, mode='a')
+        pd.DataFrame(min_list).to_csv(min_file, index = None, header=False, mode='a')
+        pd.DataFrame(max_list).to_csv(max_file, index = None, header=False, mode='a')
     print("Done!")
 
 def sample_control(chrom, pos, ref, cat, seq, nSample, window=150, bp=10):
@@ -70,14 +93,15 @@ def sample_control(chrom, pos, ref, cat, seq, nSample, window=150, bp=10):
     #useg_ub = upBound = min(len(seq), pos + window + bp)
     #subseq = seq[lseg_lb:useg_ub]
     subseq = seq[(pos - 1 - window):(pos+window)]
-    subseq = re.sub(r'^N+', '', subseq)
-    sites = [m.start() for m in re.finditer(ref, subseq)]
+    #subseq = re.sub(r'^N+', '', subseq)
+    search_pat = "(?=([ATCG]{%d}%s[ATCG]{%d}))" % (bp, ref, bp)
+    sites = [m.start() for m in re.finditer(search_pat, subseq)]
     sites = [s for s in sites if (s > bp+window+1 or s < window-bp-1)]
     window += 50 #expand window in edge case where mut_site is only ref_allele in window
   window -= 50
   while len(newlist) < nSample:
     ix = random.choice(sites)
-    chrom_ix = ix - window + pos
+    chrom_ix = ix - window + pos + bp
     try:
       newSeq = seq[(chrom_ix - bp - 1):(chrom_ix+bp)].upper()
       distance = abs(ix - window)
@@ -90,7 +114,8 @@ def sample_control(chrom, pos, ref, cat, seq, nSample, window=150, bp=10):
         'ref': ref,
         'window': window,
         'distance': distance,
-        'motif2':motif2
+        'motif2':motif2,
+        'spos': chrom_ix
       }
       newlist.append(entry)
     except ValueError:

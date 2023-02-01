@@ -28,6 +28,12 @@ def main(ref_prefix = ""):
     chrom = args.chrom
     nSample = args.nSample
     output_list = []
+    # Addition: 10-Nov-22
+    out_file = args.output
+    min_list = []
+    max_list = []
+    min_file = out_file + ".min"
+    max_file = out_file + ".max"
     # Create fasta object
     fasta_obj = Fasta(ref_file)
     seq = fasta_obj["{}{}".format(ref_prefix, chrom)] # hg37 has chromosomes indexed without the text "chr", whereas hg38 does 
@@ -55,21 +61,34 @@ def main(ref_prefix = ""):
             else:
                 cpg_bool = False
             
-            new_line = sample_control(chrom, pos, ref, cat, nSample, cpg_bool, seqstr)
-            if new_line == 0:
+            new_entry = sample_control(chrom, pos, ref, cat, nSample, cpg_bool, seqstr)
+            if new_entry == 0:
               bad_sites += 1
             else:
-              output_list.extend(new_line)
+              output_list.extend(new_entry)
+              # Find control with minimum and maximum distance
+              min_dist = min([t.get("distance") for t in new_entry])
+              max_dist = max([t.get("distance") for t in new_entry])
+              min_entry = [t for t in new_entry if t.get('distance') == min_dist]
+              max_entry = [t for t in new_entry if t.get('distance') == max_dist ]
+              min_list.extend(min_entry)
+              max_list.extend(max_entry)
             line = fp.readline()
             counter += 1
             if counter % 10000 == 0 and output_list:
                 print(counter)
-                df = pd.DataFrame(output_list)
-                df.to_csv(args.output, index = None, header=False, mode='a')
+                pd.DataFrame(output_list).to_csv(out_file, index = None, header=False, mode='a')
                 output_list = []
+                # New: add min and max files
+                pd.DataFrame(min_list).to_csv(min_file, index = None, header=False, mode='a')
+                min_list = []
+                pd.DataFrame(max_list).to_csv(max_file, index = None, header=False, mode='a')
+                max_list = []
     print("Done sampling...")
     if output_list:
-        pd.DataFrame(output_list).to_csv(args.output, index = None, header=False, mode='a')
+        pd.DataFrame(output_list).to_csv(out_file, index = None, header=False, mode='a')
+        pd.DataFrame(min_list).to_csv(min_file, index = None, header=False, mode='a')
+        pd.DataFrame(max_list).to_csv(max_file, index = None, header=False, mode='a')
     print("Done!")
     print("Number singletons without matched controls: " + str(bad_sites))
     print("Total singletons: " + str(counter))
@@ -88,7 +107,8 @@ def sample_control(chrom, pos, ref, cat, nSample, cpg_bool, seqstr, window=150, 
   while len(sites) < nSample + 1:
     subseq = seqstr[(pos - 1 - window):(pos+window)]
     #subseq = re.sub(r'^N+', '', subseq) # Trim Ns at beginning or end of sequence
-    sites = [m.start() for m in re.finditer(search_str, subseq, overlapped=True)] # These two lines were changed for CpG/non-CpG sampling
+    search_pat = "(?=([ATCG]{%d}%s[ATCG]{%d}))" % (bp, search_str, (bp - 1))
+    sites = [m.start() for m in re.finditer(search_pat, subseq)] # These two lines were changed for CpG/non-CpG sampling
     sites = [s for s in sites if (s > bp+window+1 or s < window-bp-1)]# Identify all possible motifs to sample from
     window += 100
   window -= 100
@@ -98,7 +118,7 @@ def sample_control(chrom, pos, ref, cat, nSample, cpg_bool, seqstr, window=150, 
     ix = random.choice(sites)
     if search_str == "[AGT]G":
       ix = ix + 1
-    chrom_ix = ix - window + pos
+    chrom_ix = ix - window + pos + bp
     try:
       newSeq = seqstr[(chrom_ix - bp - 1):(chrom_ix+bp)].upper()
       motif2 = full_motif(newSeq, newSeq[bp])
@@ -111,7 +131,8 @@ def sample_control(chrom, pos, ref, cat, nSample, cpg_bool, seqstr, window=150, 
         'ref': ref,
         'window': window,
         'distance': distance,
-        'motif2':motif2
+        'motif2':motif2,
+        'spos': chrom_ix
       }
       newlist.append(entry)
     except:

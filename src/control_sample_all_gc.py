@@ -28,6 +28,12 @@ def main(ref_prefix = ""):
     chrom = args.chrom
     nSample = args.nSample
     output_list = []
+    # Addition: 10-Nov-22
+    out_file = args.output
+    min_list = []
+    max_list = []
+    min_file = out_file + ".min"
+    max_file = out_file + ".max"
     # Create fasta object
     fasta_obj = Fasta(ref_file)
     seq = fasta_obj["{}{}".format(ref_prefix, chrom)] # hg37 has chromosomes indexed without the text "chr", whereas hg38 does 
@@ -50,17 +56,31 @@ def main(ref_prefix = ""):
                 line = fp.readline()
                 continue
                 
-            output_list.extend(sample_control(chrom, pos, ref, cat, nSample, seqstr))
+            new_entry = sample_control(chrom, pos, ref, cat, nSample, seqstr)
+            output_list.extend(new_entry)
+            # Find control with minimum and maximum distance
+            min_dist = min([t.get("distance") for t in new_entry])
+            max_dist = max([t.get("distance") for t in new_entry])
+            min_entry = [t for t in new_entry if t.get('distance') == min_dist]
+            max_entry = [t for t in new_entry if t.get('distance') == max_dist ]
+            min_list.extend(min_entry)
+            max_list.extend(max_entry)
             line = fp.readline()
             counter += 1
             if counter % 10000 == 0:
                 print(counter)
-                df = pd.DataFrame(output_list)
-                df.to_csv(args.output, index = None, header=False, mode='a')
+                pd.DataFrame(output_list).to_csv(args.output, index = None, header=False, mode='a')
                 output_list = []
+                # New: add min and max files
+                pd.DataFrame(min_list).to_csv(min_file, index = None, header=False, mode='a')
+                min_list = []
+                pd.DataFrame(max_list).to_csv(max_file, index = None, header=False, mode='a')
+                max_list = []
     print("Done sampling...")
     if output_list:
         pd.DataFrame(output_list).to_csv(args.output, index = None, header=False, mode='a')
+        pd.DataFrame(min_list).to_csv(min_file, index = None, header=False, mode='a')
+        pd.DataFrame(max_list).to_csv(max_file, index = None, header=False, mode='a')
     print("Done!")
 
 def sample_control(chrom, pos, ref, cat, nSample, seqstr, window=150, bp=10):
@@ -73,7 +93,8 @@ def sample_control(chrom, pos, ref, cat, nSample, seqstr, window=150, bp=10):
         
     while(len(sites) < nSample + 1):
         subseq = seqstr[(pos - 1 - window):(pos+window)]
-        sites = [m.start() for m in re.finditer(search_str, subseq, overlapped=True)] # These two lines were changed for CpG/non-CpG sampling
+        search_pat = "(?=([ATCG]{%d}%s[ATCG]{%d}))" % (bp, search_str, bp)
+        sites = [m.start() for m in re.finditer(search_pat, subseq)] # These two lines were changed for CpG/non-CpG sampling
         sites = [s for s in sites if (s > bp+window+1 or s < window-bp-1)] # Identify all possible motifs to sample from
         window += 50 #expand window in edge case where mut_site is only ref_allele in window
     window -= 50
@@ -81,7 +102,7 @@ def sample_control(chrom, pos, ref, cat, nSample, seqstr, window=150, bp=10):
         if(len(sites)==0):
             print("Bad pos: {}".format(pos))
         ix = random.choice(sites)
-        chrom_ix = ix - window + pos
+        chrom_ix = ix - window + pos + bp
         newSeq = seqstr[(chrom_ix - bp - 1):(chrom_ix+bp)].upper()
         motif2 = full_motif(newSeq, newSeq[bp])
         distance = abs(ix - window)
@@ -93,7 +114,8 @@ def sample_control(chrom, pos, ref, cat, nSample, seqstr, window=150, bp=10):
             'ref': ref,
             'window': window,
             'distance': distance,
-            'motif2':motif2
+            'motif2':motif2,
+            'spos': chrom_ix
         }
         newlist.append(entry)
         sites.remove(ix)

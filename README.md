@@ -37,6 +37,33 @@ mamba create -n bridges pyfaidx r-base r-tidyverse pandas r-doparallel r-writexl
 
 ```
 
+# Step 0: Mask reference genome
+
+For our analyses we will want to mask sites in the reference genome which are variant sites in the BRIDGES data set. In order to do this, we will:
+
+1. Convert the VCF to a list of variant sites in BED format using `src/step0_vcf2bed.sh`
+2. Mask the reference genome using the `maskfasta` option of `bedtools`
+
+After running `step0_vcf2bed.sh`, we can then combine the bed files into one using the following commands:
+
+```
+for i in `seq 1 22`; do
+cat chr${i}.bed >> bridges_sites.bed
+done
+```
+
+and then mask the reference genome:
+
+```
+bedtools maskfasta -fi /net/snowwhite/home/beckandy/research/BRIDGES_redo/reference_data/human_g1k_v37.fasta -bed /net/snowwhite/home/beckandy/research/BRIDGES_redo/reference_data/vcfbed/bridges_sites.bed -fo /net/snowwhite/home/beckandy/research/BRIDGES_redo/reference_data/masked_ref.fa
+```
+
+which we can index with samtools:
+
+```
+samtools faidx /net/snowwhite/home/beckandy/research/BRIDGES_redo/reference_data/masked_ref.fa
+```
+
 # Step 1: Generate singleton files
 
 For this step we simply rely on the vcftools `--singletons` option. This is done via a batch script (`src/step1_get_singletons_batch.sh`).
