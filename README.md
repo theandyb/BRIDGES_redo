@@ -119,6 +119,33 @@ awk -F, '{if($4 == "GC_CG")print(substr($8,1,21))}' chr*_gc.csv > GC_CG.txt
 awk -F, '{if($4 == "cpg_GC_AT")print(substr($8,1,21))}' chr*_gc.csv > cpg_GC_AT.txt
 awk -F, '{if($4 == "cpg_GC_TA")print(substr($8,1,21))}' chr*_gc.csv > cpg_GC_TA.txt
 awk -F, '{if($4 == "cpg_GC_CG")print(substr($8,1,21))}' chr*_gc.csv> cpg_GC_CG.txt
+awk -F, '{if($4 == "GC_AT" || $4 == "cpg_GC_AT")print(substr($8,1,21))}' chr*_gc_all.csv > all_GC_AT.txt
+awk -F, '{if($4 == "GC_TA" || $4 == "cpg_GC_AT")print(substr($8,1,21))}' chr*_gc_all.csv > all_GC_TA.txt
+awk -F, '{if($4 == "GC_CG" || $4 == "cpg_GC_AT")print(substr($8,1,21))}' chr*_gc_all.csv > all_GC_CG.txt
+```
+
+If wanting to perform analyses using nearest and furthest controls:
+
+```
+awk -F, '{if($4 == "AT_CG")print(substr($8,1,21))}' chr*_at.csv.min > AT_CG_min.txt
+awk -F, '{if($4 == "AT_GC")print(substr($8,1,21))}' chr*_at.csv.min > AT_GC_min.txt
+awk -F, '{if($4 == "AT_TA")print(substr($8,1,21))}' chr*_at.csv.min > AT_TA_min.txt
+awk -F, '{if($4 == "GC_AT")print(substr($8,1,21))}' chr*_gc.csv.min > GC_AT_min.txt
+awk -F, '{if($4 == "GC_TA")print(substr($8,1,21))}' chr*_gc.csv.min > GC_TA_min.txt
+awk -F, '{if($4 == "GC_CG")print(substr($8,1,21))}' chr*_gc.csv.min > GC_CG_min.txt
+awk -F, '{if($4 == "cpg_GC_AT")print(substr($8,1,21))}' chr*_gc.csv.min > cpg_GC_AT_min.txt
+awk -F, '{if($4 == "cpg_GC_TA")print(substr($8,1,21))}' chr*_gc.csv.min > cpg_GC_TA_min.txt
+awk -F, '{if($4 == "cpg_GC_CG")print(substr($8,1,21))}' chr*_gc.csv.min > cpg_GC_CG_min.txt
+
+awk -F, '{if($4 == "AT_CG")print(substr($8,1,21))}' chr*_at.csv.max > AT_CG_max.txt
+awk -F, '{if($4 == "AT_GC")print(substr($8,1,21))}' chr*_at.csv.max > AT_GC_max.txt
+awk -F, '{if($4 == "AT_TA")print(substr($8,1,21))}' chr*_at.csv.max > AT_TA_max.txt
+awk -F, '{if($4 == "GC_AT")print(substr($8,1,21))}' chr*_gc.csv.max > GC_AT_max.txt
+awk -F, '{if($4 == "GC_TA")print(substr($8,1,21))}' chr*_gc.csv.max > GC_TA_max.txt
+awk -F, '{if($4 == "GC_CG")print(substr($8,1,21))}' chr*_gc.csv.max > GC_CG_max.txt
+awk -F, '{if($4 == "cpg_GC_AT")print(substr($8,1,21))}' chr*_gc.csv.max > cpg_GC_AT_max.txt
+awk -F, '{if($4 == "cpg_GC_TA")print(substr($8,1,21))}' chr*_gc.csv.max > cpg_GC_TA_max.txt
+awk -F, '{if($4 == "cpg_GC_CG")print(substr($8,1,21))}' chr*_gc.csv.max > cpg_GC_CG_max.txt
 ```
 
 # Step 5: Genome-wide Background Rates - Single Position Models

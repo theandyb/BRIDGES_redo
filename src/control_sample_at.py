@@ -94,14 +94,16 @@ def sample_control(chrom, pos, ref, cat, seq, nSample, window=150, bp=10):
     #subseq = seq[lseg_lb:useg_ub]
     subseq = seq[(pos - 1 - window):(pos+window)]
     #subseq = re.sub(r'^N+', '', subseq)
-    search_pat = "(?=([ATCG]{%d}%s[ATCG]{%d}))" % (bp, ref, bp)
-    sites = [m.start() for m in re.finditer(search_pat, subseq)]
+    #search_pat = "(?=([ATCG]{%d}%s[ATCG]{%d}))" % (bp, ref, bp)
+    #sites = [m.start() for m in re.finditer(search_pat, subseq)]
+    sites = [m.start() for m in re.finditer(ref, subseq)]
     sites = [s for s in sites if (s > bp+window+1 or s < window-bp-1)]
     window += 50 #expand window in edge case where mut_site is only ref_allele in window
   window -= 50
   while len(newlist) < nSample:
     ix = random.choice(sites)
-    chrom_ix = ix - window + pos + bp
+    #chrom_ix = ix - window + pos + bp
+    chrom_ix = ix - window + pos
     try:
       newSeq = seq[(chrom_ix - bp - 1):(chrom_ix+bp)].upper()
       distance = abs(ix - window)

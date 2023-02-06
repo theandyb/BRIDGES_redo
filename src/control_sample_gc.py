@@ -107,8 +107,9 @@ def sample_control(chrom, pos, ref, cat, nSample, cpg_bool, seqstr, window=150, 
   while len(sites) < nSample + 1:
     subseq = seqstr[(pos - 1 - window):(pos+window)]
     #subseq = re.sub(r'^N+', '', subseq) # Trim Ns at beginning or end of sequence
-    search_pat = "(?=([ATCG]{%d}%s[ATCG]{%d}))" % (bp, search_str, (bp - 1))
-    sites = [m.start() for m in re.finditer(search_pat, subseq)] # These two lines were changed for CpG/non-CpG sampling
+    #search_pat = "(?=([ATCG]{%d}%s[ATCG]{%d}))" % (bp, search_str, (bp - 1))
+    #sites = [m.start() for m in re.finditer(search_pat, subseq)] 
+    sites = [m.start() for m in re.finditer(search_str, subseq, overlapped=True)] # These two lines were changed for CpG/non-CpG sampling
     sites = [s for s in sites if (s > bp+window+1 or s < window-bp-1)]# Identify all possible motifs to sample from
     window += 100
   window -= 100
@@ -118,7 +119,8 @@ def sample_control(chrom, pos, ref, cat, nSample, cpg_bool, seqstr, window=150, 
     ix = random.choice(sites)
     if search_str == "[AGT]G":
       ix = ix + 1
-    chrom_ix = ix - window + pos + bp
+    #chrom_ix = ix - window + pos + bp
+    chrom_ix = ix - window + pos
     try:
       newSeq = seqstr[(chrom_ix - bp - 1):(chrom_ix+bp)].upper()
       motif2 = full_motif(newSeq, newSeq[bp])

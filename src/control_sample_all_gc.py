@@ -93,8 +93,9 @@ def sample_control(chrom, pos, ref, cat, nSample, seqstr, window=150, bp=10):
         
     while(len(sites) < nSample + 1):
         subseq = seqstr[(pos - 1 - window):(pos+window)]
-        search_pat = "(?=([ATCG]{%d}%s[ATCG]{%d}))" % (bp, search_str, bp)
-        sites = [m.start() for m in re.finditer(search_pat, subseq)] # These two lines were changed for CpG/non-CpG sampling
+        #search_pat = "(?=([ATCG]{%d}%s[ATCG]{%d}))" % (bp, search_str, bp)
+        #sites = [m.start() for m in re.finditer(search_pat, subseq)] # These two lines were changed for CpG/non-CpG sampling
+        sites = [m.start() for m in re.finditer(search_str, subseq, overlapped=True)]
         sites = [s for s in sites if (s > bp+window+1 or s < window-bp-1)] # Identify all possible motifs to sample from
         window += 50 #expand window in edge case where mut_site is only ref_allele in window
     window -= 50
@@ -102,7 +103,8 @@ def sample_control(chrom, pos, ref, cat, nSample, seqstr, window=150, bp=10):
         if(len(sites)==0):
             print("Bad pos: {}".format(pos))
         ix = random.choice(sites)
-        chrom_ix = ix - window + pos + bp
+        #chrom_ix = ix - window + pos + bp
+        chrom_ix = ix - window + pos
         newSeq = seqstr[(chrom_ix - bp - 1):(chrom_ix+bp)].upper()
         motif2 = full_motif(newSeq, newSeq[bp])
         distance = abs(ix - window)
